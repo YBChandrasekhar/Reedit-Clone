@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+:root {
+  --reddit-orange: #ff4500;
+  --reddit-blue: #0079d3;
+  --reddit-bg: #dae0e6;
+  --reddit-card: #ffffff;
+  --reddit-border: #edeff1;
+  --reddit-text: #1c1c1c;
+  --reddit-muted: #878a8c;
+}
+
+body {
+  background-color: var(--reddit-bg);
+  color: var(--reddit-text);
+  font-family: var(--font-geist), Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
