@@ -19,3 +19,26 @@ export async function POST(req: Request) {
 
   return NextResponse.json(post, { status: 201 });
 }
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const sort = searchParams.get("sort") || "latest";
+  const communityId = searchParams.get("communityId");
+
+  const where = communityId ? { communityId } : {};
+
+  const posts = await prisma.post.findMany({
+    where,
+    orderBy: sort === "popular"
+      ? { votes: { _count: "desc" } }
+      : { createdAt: "desc" },
+    include: {
+      author: true,
+      community: true,
+      votes: true,
+      _count: { select: { comments: true, votes: true } },
+    },
+  });
+
+  return NextResponse.json(posts);
+}

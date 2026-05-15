@@ -20,10 +20,16 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const sort = searchParams.get("sort") || "latest";
+
   const communities = await prisma.community.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: sort === "popular"
+      ? { posts: { _count: "desc" } }
+      : { createdAt: "desc" },
     include: { _count: { select: { posts: true } } },
   });
+
   return NextResponse.json(communities);
 }
