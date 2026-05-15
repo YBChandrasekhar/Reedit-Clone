@@ -26,12 +26,9 @@ export default function PostCard({ post, currentUserId }: Props) {
 
   return (
     <div className="bg-white rounded-lg border border-[#edeff1] hover:border-[#878a8c] transition flex">
-      {/* Vote Column */}
       <div className="flex flex-col items-center p-3 bg-[#f8f9fa] rounded-l-lg">
         <VoteButton postId={post.id} initialVotes={voteCount} initialUserVote={userVote} />
       </div>
-
-      {/* Post Content */}
       <Link href={`/r/${post.community.slug}/${post.id}`} className="flex-1 p-4 block">
         <p className="text-xs text-[#878a8c] mb-1">
           r/{post.community.name} • u/{post.author.username}

@@ -6,11 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.3.2",
@@ -18,7 +14,6 @@
     "next": "16.2.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "svix": "^1.93.0",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
