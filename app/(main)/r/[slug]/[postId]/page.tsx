@@ -20,12 +20,16 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
   const voteCount = post.votes.filter((v) => v.type === "UP").length - post.votes.filter((v) => v.type === "DOWN").length;
 
   let userVote: "UP" | "DOWN" | null = null;
+  let currentUserId: string | null = null;
   if (userId) {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    if (user) userVote = (post.votes.find((v) => v.userId === user.id)?.type as "UP" | "DOWN") ?? null;
+    const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+    if (dbUser) {
+      currentUserId = dbUser.id;
+      userVote = (post.votes.find((v) => v.userId === dbUser.id)?.type as "UP" | "DOWN") ?? null;
+    }
   }
 
-  const comments = post.comments.map((c) => ({ id: c.id, content: c.content, createdAt: c.createdAt.toISOString(), author: { username: c.author.username } }));
+  const comments = post.comments.map((c) => ({ id: c.id, content: c.content, createdAt: c.createdAt.toISOString(), authorId: c.authorId, author: { username: c.author.username } }));
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -47,7 +51,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ slu
           </div>
         </div>
       </div>
-      <CommentSection postId={post.id} initialComments={comments} />
+      <CommentSection postId={post.id} initialComments={comments} currentUserId={currentUserId} />
     </div>
   );
 }
