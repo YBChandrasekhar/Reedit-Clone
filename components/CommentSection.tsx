@@ -7,19 +7,31 @@ type Comment = {
   id: string;
   content: string;
   createdAt: string;
+  authorId: string;
   author: { username: string };
 };
 
 type Props = {
   postId: string;
   initialComments: Comment[];
+  currentUserId?: string | null;
 };
 
-export default function CommentSection({ postId, initialComments }: Props) {
+export default function CommentSection({ postId, initialComments, currentUserId }: Props) {
   const [comments, setComments] = useState<Comment[]>(initialComments);
 
   function handleCommentAdded(comment: Comment) {
     setComments((prev) => [comment, ...prev]);
+  }
+
+  async function handleDelete(commentId: string) {
+    if (!confirm("Delete this comment?")) return;
+    const res = await fetch(`/api/posts/${postId}/comments`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commentId }),
+    });
+    if (res.ok) setComments((prev) => prev.filter((c) => c.id !== commentId));
   }
 
   return (
@@ -32,9 +44,20 @@ export default function CommentSection({ postId, initialComments }: Props) {
         <div className="flex flex-col gap-4">
           {comments.map((comment) => (
             <div key={comment.id} className="border-l-2 border-[#edeff1] pl-4">
-              <p className="text-xs text-[#878a8c] mb-1">
-                u/{comment.author.username} • {new Date(comment.createdAt).toLocaleDateString()}
-              </p>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs text-[#878a8c]">
+                  u/{comment.author.username} • {new Date(comment.createdAt).toLocaleDateString()}
+                </p>
+                {currentUserId && currentUserId === comment.authorId && (
+                  <button
+                    onClick={() => handleDelete(comment.id)}
+                    className="text-xs text-[#878a8c] hover:text-red-500 transition"
+                    title="Delete comment"
+                  >
+                    🗑️
+                  </button>
+                )}
+              </div>
               <p className="text-sm">{comment.content}</p>
             </div>
           ))}

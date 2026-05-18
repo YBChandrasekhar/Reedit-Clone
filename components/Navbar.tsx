@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { SignInButton, SignUpButton, UserButton, useAuth, useUser } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -10,6 +10,17 @@ export default function Navbar() {
   const { user } = useUser();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const router = useRouter();
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const q = search.trim();
+    if (q.length < 2) return;
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+    setSearch("");
+    setMenuOpen(false);
+  }
   const username =
     user?.username ?? user?.emailAddresses?.[0]?.emailAddress?.split("@")[0];
 
@@ -28,13 +39,15 @@ export default function Navbar() {
         </Link>
 
         {/* Search — desktop */}
-        <div className="hidden sm:flex flex-1 max-w-sm">
+        <form onSubmit={handleSearch} className="hidden sm:flex flex-1 max-w-sm">
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search Reddit Clone"
             className="w-full border border-[#edeff1] rounded-full px-4 py-1 text-sm outline-none focus:border-[#878a8c] bg-[#f6f7f8]"
           />
-        </div>
+        </form>
 
         {/* Desktop Nav */}
         <div className="hidden sm:flex items-center gap-1 shrink-0">
@@ -125,6 +138,15 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <form onSubmit={handleSearch} className="flex mt-1">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search Reddit Clone"
+              className="w-full border border-[#edeff1] rounded-full px-4 py-2 text-sm outline-none focus:border-[#878a8c] bg-[#f6f7f8]"
+            />
+          </form>
           {isSignedIn && (
             <>
               <Link

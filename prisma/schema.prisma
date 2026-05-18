@@ -44,13 +44,16 @@ model Post {
 }
 
 model Comment {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   content   String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  createdAt DateTime @default(now())
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  String?
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
 }
 
 model Vote {
