@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import PostCard from "@/components/PostCard";
 import SortBar from "@/components/SortBar";
+import EmptyState from "@/components/EmptyState";
 import { Suspense } from "react";
 import { PostSkeleton } from "@/components/Skeletons";
 
@@ -52,9 +53,18 @@ export default async function Home({
   const hasMore = skip + posts.length < totalPosts;
 
   let currentUserId: string | null = null;
+  let joinedCommunities: { community: { id: string; name: string; slug: string } }[] = [];
+
   if (userId) {
-    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
-    currentUserId = user?.id ?? null;
+    const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+    if (dbUser) {
+      currentUserId = dbUser.id;
+      joinedCommunities = await prisma.member.findMany({
+        where: { userId: dbUser.id },
+        include: { community: { select: { id: true, name: true, slug: true } } },
+        take: 5,
+      });
+    }
   }
 
   return (
@@ -66,21 +76,13 @@ export default async function Home({
         </Suspense>
 
         {posts.length === 0 ? (
-          <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-            <p className="text-4xl mb-3">📭</p>
-            <p className="font-semibold text-lg mb-1">No posts yet</p>
-            <p className="text-[#878a8c] text-sm mb-4">
-              {sort === "trending"
-                ? "No trending posts in the last 7 days."
-                : "Create a community and start posting!"}
-            </p>
-            <Link
-              href="/communities/create"
-              className="bg-[#ff4500] text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-[#e03d00] transition"
-            >
-              Create Community
-            </Link>
-          </div>
+          <EmptyState
+            icon="📭"
+            title="No posts yet"
+            description={sort === "trending" ? "No trending posts in the last 7 days." : "Create a community and start posting!"}
+            actionLabel="Create Community"
+            actionHref="/communities/create"
+          />
         ) : (
           <>
             <Suspense
@@ -97,7 +99,6 @@ export default async function Home({
               </div>
             </Suspense>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-6">
                 {pageNum > 1 && (
@@ -150,6 +151,27 @@ export default async function Home({
             </div>
           </div>
         </div>
+
+        {/* My Communities */}
+        {joinedCommunities.length > 0 && (
+          <div className="bg-white rounded-lg border border-[#edeff1] p-4 mb-4">
+            <h2 className="font-bold mb-3">🏘️ My Communities</h2>
+            <div className="flex flex-col gap-2">
+              {joinedCommunities.map(({ community: c }) => (
+                <Link
+                  key={c.id}
+                  href={`/r/${c.slug}`}
+                  className="flex items-center gap-2 py-1 hover:text-[#ff4500] transition text-sm"
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#ff4500] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {c.name[0].toUpperCase()}
+                  </div>
+                  <span className="truncate">r/{c.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="bg-white rounded-lg border border-[#edeff1] p-4 mb-4">

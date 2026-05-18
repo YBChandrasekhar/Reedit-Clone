@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import PostCard from "@/components/PostCard";
 import { PostSkeleton } from "@/components/Skeletons";
+import EmptyState from "@/components/EmptyState";
 import { Suspense } from "react";
-import Link from "next/link";
 
 export default async function TrendingPage() {
   const { userId } = await auth();
@@ -39,19 +39,13 @@ export default async function TrendingPage() {
       </div>
 
       {posts.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-          <p className="text-4xl mb-3">📭</p>
-          <p className="font-semibold text-lg mb-1">No trending posts yet</p>
-          <p className="text-[#878a8c] text-sm mb-4">
-            Be the first to post and get votes!
-          </p>
-          <Link
-            href="/communities"
-            className="bg-[#ff4500] text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-[#e03d00] transition"
-          >
-            Browse Communities
-          </Link>
-        </div>
+        <EmptyState
+          icon="📭"
+          title="No trending posts yet"
+          description="Be the first to post and get votes!"
+          actionLabel="Browse Communities"
+          actionHref="/communities"
+        />
       ) : (
         <Suspense
           fallback={

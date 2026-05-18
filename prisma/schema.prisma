@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  clerkId   String    @unique
-  email     String    @unique
-  username  String    @unique
-  imageUrl  String?
-  posts     Post[]
-  comments  Comment[]
-  votes     Vote[]
-  createdAt DateTime  @default(now())
+  id          String    @id @default(cuid())
+  clerkId     String    @unique
+  email       String    @unique
+  username    String    @unique
+  imageUrl    String?
+  posts       Post[]
+  comments    Comment[]
+  votes       Vote[]
+  memberships Member[]
+  createdAt   DateTime  @default(now())
 }
 
 model Community {
@@ -25,7 +26,19 @@ model Community {
   slug        String   @unique
   description String?
   posts       Post[]
+  members     Member[]
   createdAt   DateTime @default(now())
+}
+
+model Member {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  communityId String
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, communityId])
 }
 
 model Post {
