@@ -29,6 +29,7 @@ export default async function CommunityPage({
           author: true,
           community: true,
           votes: true,
+          // likes: true,
           _count: { select: { comments: true, votes: true } },
         },
       },

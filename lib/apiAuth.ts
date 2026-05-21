@@ -7,9 +7,17 @@ export async function requireAuth() {
   if (!userId) {
     return { user: null, error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
-  const user = await prisma.user.findUnique({ where: { clerkId: userId } });
+  let user = await prisma.user.findUnique({ where: { clerkId: userId } });
   if (!user) {
-    return { user: null, error: NextResponse.json({ error: "User not found. Please sign in again." }, { status: 404 }) };
+    // Auto-create user if webhook missed
+    const { currentUser } = await import("@clerk/nextjs/server");
+    const clerkUser = await currentUser();
+    if (!clerkUser) return { user: null, error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+    const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
+    const username = clerkUser.username ?? email.split("@")[0];
+    user = await prisma.user.create({
+      data: { clerkId: userId, email, username, imageUrl: clerkUser.imageUrl },
+    });
   }
   return { user, error: null };
 }

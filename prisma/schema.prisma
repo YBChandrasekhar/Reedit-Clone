@@ -16,6 +16,7 @@ model User {
   posts       Post[]
   comments    Comment[]
   votes       Vote[]
+  likes       Like[]
   memberships Member[]
   createdAt   DateTime  @default(now())
 }
@@ -53,6 +54,7 @@ model Post {
   authorId    String
   comments    Comment[]
   votes       Vote[]
+  likes       Like[]
   createdAt   DateTime  @default(now())
 }
 
@@ -72,6 +74,16 @@ model Comment {
 model Vote {
   id     String @id @default(cuid())
   type   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@unique([userId, postId])
+}
+
+model Like {
+  id     String @id @default(cuid())
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
