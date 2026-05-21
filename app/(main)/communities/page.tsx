@@ -32,7 +32,7 @@ export default async function CommunitiesPage({ searchParams }: { searchParams: 
       ) : (
         <Suspense fallback={<div className="flex flex-col gap-3">{[...Array(4)].map((_, i) => <CommunitySkeleton key={i} />)}</div>}>
           <div className="flex flex-col gap-3">
-            {communities.map((community) => (
+            {communities.map((community: typeof communities[0]) => (
               <Link key={community.id} href={`/r/${community.slug}`} className="bg-white rounded-lg p-4 border border-[#edeff1] hover:border-[#878a8c] transition flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-[#ff4500] flex items-center justify-center text-white text-sm font-bold shrink-0">
