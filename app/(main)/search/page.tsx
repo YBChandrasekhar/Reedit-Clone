@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
+import EmptyState from "@/components/EmptyState";
 
 export default async function SearchPage({
   searchParams,
@@ -14,10 +15,7 @@ export default async function SearchPage({
   if (!q || q.trim().length < 2) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-          <p className="text-4xl mb-3">🔍</p>
-          <p className="font-semibold text-lg">Enter at least 2 characters to search</p>
-        </div>
+        <EmptyState icon="🔍" title="Search Reddit Clone" description="Enter at least 2 characters to search" />
       </div>
     );
   }
@@ -36,7 +34,6 @@ export default async function SearchPage({
         author: true,
         community: true,
         votes: true,
-        // likes: true,
         _count: { select: { comments: true, votes: true } },
       },
     }),
@@ -63,18 +60,12 @@ export default async function SearchPage({
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-lg p-4 border border-[#edeff1] mb-4">
-        <h1 className="font-bold text-lg">
-          Search results for &quot;{q}&quot;
-        </h1>
+        <h1 className="font-bold text-lg">Search results for &quot;{q}&quot;</h1>
         <p className="text-sm text-[#878a8c]">{total} result{total !== 1 ? "s" : ""} found</p>
       </div>
 
       {total === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-          <p className="text-4xl mb-3">😕</p>
-          <p className="font-semibold text-lg mb-1">No results found</p>
-          <p className="text-[#878a8c] text-sm">Try a different search term</p>
-        </div>
+        <EmptyState icon="😕" title="No results found" description="Try a different search term" />
       ) : (
         <>
           {communities.length > 0 && (
@@ -95,9 +86,7 @@ export default async function SearchPage({
                       </div>
                       <div>
                         <p className="font-semibold text-[#ff4500]">r/{c.name}</p>
-                        {c.description && (
-                          <p className="text-xs text-[#878a8c]">{c.description}</p>
-                        )}
+                        {c.description && <p className="text-xs text-[#878a8c]">{c.description}</p>}
                       </div>
                     </div>
                     <span className="text-sm text-[#878a8c] shrink-0">{c._count.posts} posts</span>

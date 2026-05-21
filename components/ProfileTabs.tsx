@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import PostCard from "@/components/PostCard";
+import EmptyState from "@/components/EmptyState";
 
 type Post = {
   id: string;
@@ -14,7 +15,6 @@ type Post = {
   author: { username: string };
   community: { slug: string; name: string };
   votes: { type: string; userId: string }[];
-  likes?: { userId: string }[];
   _count: { comments: number; votes: number };
 };
 
@@ -36,7 +36,6 @@ export default function ProfileTabs({ posts, comments, currentUserId }: Props) {
 
   return (
     <div>
-      {/* Tabs */}
       <div className="bg-white rounded-lg border border-[#edeff1] p-2 flex gap-2 mb-4">
         <button
           onClick={() => setTab("posts")}
@@ -56,32 +55,22 @@ export default function ProfileTabs({ posts, comments, currentUserId }: Props) {
         </button>
       </div>
 
-      {/* Posts Tab */}
       {tab === "posts" && (
         <div className="flex flex-col gap-3">
           {posts.length === 0 ? (
-            <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-              <p className="text-4xl mb-3">📝</p>
-              <p className="font-semibold text-lg mb-1">No posts yet</p>
-              <p className="text-[#878a8c] text-sm">Posts will appear here</p>
-            </div>
+            <EmptyState icon="📝" title="No posts yet" description="Posts will appear here" />
           ) : (
-  posts.map((post: typeof posts[0]) => (
+            posts.map((post) => (
               <PostCard key={post.id} post={post} currentUserId={currentUserId} />
             ))
           )}
         </div>
       )}
 
-      {/* Comments Tab */}
       {tab === "comments" && (
         <div className="flex flex-col gap-3">
           {comments.length === 0 ? (
-            <div className="bg-white rounded-lg p-12 text-center border border-[#edeff1]">
-              <p className="text-4xl mb-3">💬</p>
-              <p className="font-semibold text-lg mb-1">No comments yet</p>
-              <p className="text-[#878a8c] text-sm">Comments will appear here</p>
-            </div>
+            <EmptyState icon="💬" title="No comments yet" description="Comments will appear here" />
           ) : (
             comments.map((comment) => (
               <Link
