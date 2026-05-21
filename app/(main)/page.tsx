@@ -94,7 +94,7 @@ export default async function Home({
               }
             >
               <div className="flex flex-col gap-3">
-                {posts.map((post) => (
+                {posts.map((post: typeof posts[0]) => (
                   <PostCard key={post.id} post={post} currentUserId={currentUserId} />
                 ))}
               </div>

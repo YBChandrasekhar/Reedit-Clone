@@ -10,9 +10,11 @@ type Post = {
   content: string | null;
   type: string;
   createdAt: Date;
+  authorId: string;
   author: { username: string };
   community: { slug: string; name: string };
   votes: { type: string; userId: string }[];
+  likes?: { userId: string }[];
   _count: { comments: number; votes: number };
 };
 
@@ -64,7 +66,7 @@ export default function ProfileTabs({ posts, comments, currentUserId }: Props) {
               <p className="text-[#878a8c] text-sm">Posts will appear here</p>
             </div>
           ) : (
-            posts.map((post) => (
+  posts.map((post: typeof posts[0]) => (
               <PostCard key={post.id} post={post} currentUserId={currentUserId} />
             ))
           )}

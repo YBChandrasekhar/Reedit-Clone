@@ -8,6 +8,7 @@ type Comment = {
   id: string;
   content: string;
   createdAt: string;
+  authorId: string;
   author: { username: string };
 };
 
