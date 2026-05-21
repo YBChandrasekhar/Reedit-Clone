@@ -2,21 +2,27 @@
 
 A full-stack Reddit-style community platform built with Next.js 16, Prisma, Supabase, Clerk, and Cloudinary.
 
+## Live Demo
+
+🚀 [https://your-app.vercel.app](https://your-app.vercel.app)
+
 ## Features
 
 - Authentication (Sign up / Sign in) via Clerk
 - Create and browse communities (subreddits)
 - Create posts — text, image, and link types
 - Upvote / Downvote posts
-- Like posts with ❤️
 - Comment on posts and delete your own comments
 - Join / Leave communities
+- Member count per community
 - Search posts and communities
 - Trending posts (last 7 days)
-- User profile page
+- User profile page with posts and comments tabs
 - Route protection for authenticated actions
 - Image uploads via Cloudinary
-- Responsive UI
+- Delete your own posts and comments
+- Responsive UI with loading skeletons and empty states
+- Custom 404 page
 
 ## Tech Stack
 
@@ -43,10 +49,12 @@ reddit-clone/
 │   │   ├── r/[slug]/    # Community + post detail
 │   │   ├── search/      # Search results
 │   │   ├── trending/    # Trending posts
+│   │   ├── unauthorized/# Auth required page
 │   │   └── u/[username] # User profile
-│   └── api/             # API routes
+│   ├── api/             # API routes
+│   └── not-found.tsx    # Custom 404
 ├── components/          # Reusable UI components
-├── lib/                 # Prisma client, auth helpers
+├── lib/                 # Prisma client, auth helpers, cloudinary
 ├── prisma/              # Schema and seed data
 └── public/              # Static assets
 ```
@@ -83,8 +91,8 @@ cp .env.example .env
 
 ```env
 # Database
-DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/postgres"
 
 # Clerk
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
@@ -125,7 +133,7 @@ Run ngrok to expose localhost:
 ```
 
 Add webhook endpoint in Clerk Dashboard:
-- URL: `https://your-ngrok-url.ngrok-free.dev/api/webhooks/clerk`
+- URL: `https://your-ngrok-url.ngrok-free.app/api/webhooks/clerk`
 - Events: `user.created`, `user.updated`, `user.deleted`
 
 ## API Routes
@@ -138,7 +146,6 @@ Add webhook endpoint in Clerk Dashboard:
 | GET/POST | `/api/posts` | List / create posts |
 | DELETE | `/api/posts/[postId]` | Delete post |
 | POST | `/api/posts/[postId]/vote` | Upvote / downvote |
-| POST | `/api/posts/[postId]/like` | Like / unlike |
 | GET/POST/DELETE | `/api/posts/[postId]/comments` | Manage comments |
 | POST | `/api/upload` | Upload image to Cloudinary |
 | GET | `/api/feed` | Paginated home feed |
@@ -149,16 +156,16 @@ Add webhook endpoint in Clerk Dashboard:
 
 ### Deploy to Vercel
 
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com) → Import project
-3. Add all environment variables from `.env`
+1. Push code to GitHub
+2. Go to [vercel.com](https://vercel.com) → New Project → Import from GitHub
+3. Add all environment variables
 4. Deploy
 
 ### Update Clerk for production
 
 In Clerk Dashboard → Domains → add your Vercel domain.
 
-Update webhook URL to your Vercel domain:
+Update webhook URL:
 ```
 https://your-app.vercel.app/api/webhooks/clerk
 ```
@@ -171,7 +178,6 @@ https://your-app.vercel.app/api/webhooks/clerk
 - `Post` — Text, image, or link posts
 - `Comment` — Nested comments on posts
 - `Vote` — Upvotes and downvotes on posts
-- `Like` — Heart likes on posts
 
 ## License
 
