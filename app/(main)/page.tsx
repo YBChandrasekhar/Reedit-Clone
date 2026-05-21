@@ -7,6 +7,15 @@ import EmptyState from "@/components/EmptyState";
 import { Suspense } from "react";
 import { PostSkeleton } from "@/components/Skeletons";
 
+type Community = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  createdAt: Date;
+  _count: { posts: number };
+};
+
 export default async function Home({
   searchParams,
 }: {
@@ -37,7 +46,6 @@ export default async function Home({
         author: true,
         community: true,
         votes: true,
-        // likes: true,
         _count: { select: { comments: true, votes: true } },
       },
     }),
@@ -94,7 +102,7 @@ export default async function Home({
               }
             >
               <div className="flex flex-col gap-3">
-                {posts.map((post: typeof posts[0]) => (
+                {posts.map((post) => (
                   <PostCard key={post.id} post={post} currentUserId={currentUserId} />
                 ))}
               </div>
@@ -198,7 +206,7 @@ export default async function Home({
           <div className="bg-white rounded-lg border border-[#edeff1] p-4">
             <h2 className="font-bold mb-3">🔥 Top Communities</h2>
             <div className="flex flex-col gap-2">
-              {communities.map((c: typeof communities[0], i: number) => (
+              {(communities as Community[]).map((c, i) => (
                 <Link
                   key={c.id}
                   href={`/r/${c.slug}`}
