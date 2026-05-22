@@ -46,6 +46,7 @@ export default async function Home({
         author: true,
         community: true,
         votes: true,
+        likes: true,
         _count: { select: { comments: true, votes: true } },
       },
     }),

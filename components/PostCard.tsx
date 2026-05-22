@@ -11,6 +11,7 @@ type Props = {
     id: string;
     title: string;
     content: string | null;
+    imageUrl: string | null;
     type: string;
     createdAt: Date;
     authorId: string;
@@ -18,7 +19,7 @@ type Props = {
     community: { slug: string; name: string };
     _count: { comments: number; votes: number };
     votes: { type: string; userId: string }[];
-    likes?: { userId: string }[];
+    likes: { userId: string }[];
   };
   currentUserId?: string | null;
 };
@@ -34,8 +35,8 @@ export default function PostCard({ post, currentUserId }: Props) {
   const userVote = currentUserId
     ? (post.votes.find((v) => v.userId === currentUserId)?.type as "UP" | "DOWN") ?? null
     : null;
-  const likeCount = post.likes?.length ?? 0;
-  const userLiked = currentUserId ? (post.likes?.some((l) => l.userId === currentUserId) ?? false) : false;
+  const likeCount = post.likes.length;
+  const userLiked = currentUserId ? post.likes.some((l) => l.userId === currentUserId) : false;
 
   async function handleDelete(e: React.MouseEvent) {
     e.preventDefault();

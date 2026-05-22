@@ -9,12 +9,14 @@ type Post = {
   id: string;
   title: string;
   content: string | null;
+  imageUrl: string | null;
   type: string;
   createdAt: Date;
   authorId: string;
   author: { username: string };
   community: { slug: string; name: string };
   votes: { type: string; userId: string }[];
+  likes: { userId: string }[];
   _count: { comments: number; votes: number };
 };
 
