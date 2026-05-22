@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
-import LikeButton from "@/components/LikeButton";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -18,7 +17,6 @@ type Props = {
     community: { slug: string; name: string };
     _count: { comments: number; votes: number };
     votes: { type: string; userId: string }[];
-    likes?: { userId: string }[];
   };
   currentUserId?: string | null;
 };
@@ -34,8 +32,6 @@ export default function PostCard({ post, currentUserId }: Props) {
   const userVote = currentUserId
     ? (post.votes.find((v) => v.userId === currentUserId)?.type as "UP" | "DOWN") ?? null
     : null;
-  const likeCount = post.likes?.length ?? 0;
-  const userLiked = currentUserId ? (post.likes?.some((l) => l.userId === currentUserId) ?? false) : false;
 
   async function handleDelete(e: React.MouseEvent) {
     e.preventDefault();
@@ -66,7 +62,6 @@ export default function PostCard({ post, currentUserId }: Props) {
         )}
         <div className="flex gap-4 mt-3 text-xs text-[#878a8c]">
           <span>{post._count.comments} comments</span>
-          <LikeButton postId={post.id} initialLikes={likeCount} initialLiked={userLiked} />
         </div>
       </Link>
       {isOwner && (
