@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import VoteButton from "@/components/VoteButton";
+import LikeButton from "@/components/LikeButton";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type Props = {
   post: {
@@ -8,21 +13,37 @@ type Props = {
     content: string | null;
     type: string;
     createdAt: Date;
+    authorId: string;
     author: { username: string };
     community: { slug: string; name: string };
     _count: { comments: number; votes: number };
     votes: { type: string; userId: string }[];
+    likes?: { userId: string }[];
   };
   currentUserId?: string | null;
 };
 
 export default function PostCard({ post, currentUserId }: Props) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
+  const isOwner = currentUserId && currentUserId === post.authorId;
+
   const upvotes = post.votes.filter((v) => v.type === "UP").length;
   const downvotes = post.votes.filter((v) => v.type === "DOWN").length;
   const voteCount = upvotes - downvotes;
   const userVote = currentUserId
     ? (post.votes.find((v) => v.userId === currentUserId)?.type as "UP" | "DOWN") ?? null
     : null;
+  const likeCount = post.likes?.length ?? 0;
+  const userLiked = currentUserId ? (post.likes?.some((l) => l.userId === currentUserId) ?? false) : false;
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!confirm("Delete this post?")) return;
+    setDeleting(true);
+    await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+    router.refresh();
+  }
 
   return (
     <div className="bg-white rounded-lg border border-[#edeff1] hover:border-[#878a8c] transition flex">
@@ -45,8 +66,21 @@ export default function PostCard({ post, currentUserId }: Props) {
         )}
         <div className="flex gap-4 mt-3 text-xs text-[#878a8c]">
           <span>{post._count.comments} comments</span>
+          <LikeButton postId={post.id} initialLikes={likeCount} initialLiked={userLiked} />
         </div>
       </Link>
+      {isOwner && (
+        <div className="flex items-start p-3">
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="text-xs text-[#878a8c] hover:text-red-500 transition disabled:opacity-50"
+            title="Delete post"
+          >
+            {deleting ? "..." : "🗑️"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

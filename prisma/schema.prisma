@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -7,15 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  clerkId   String    @unique
-  email     String    @unique
-  username  String    @unique
-  imageUrl  String?
-  posts     Post[]
-  comments  Comment[]
-  votes     Vote[]
-  createdAt DateTime  @default(now())
+  id          String    @id @default(cuid())
+  clerkId     String    @unique
+  email       String    @unique
+  username    String    @unique
+  imageUrl    String?
+  posts       Post[]
+  comments    Comment[]
+  votes       Vote[]
+  likes       Like[]
+  memberships Member[]
+  createdAt   DateTime  @default(now())
 }
 
 model Community {
@@ -24,7 +27,19 @@ model Community {
   slug        String   @unique
   description String?
   posts       Post[]
+  members     Member[]
   createdAt   DateTime @default(now())
+}
+
+model Member {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  communityId String
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, communityId])
 }
 
 model Post {
@@ -39,22 +54,36 @@ model Post {
   authorId    String
   comments    Comment[]
   votes       Vote[]
+  likes       Like[]
   createdAt   DateTime  @default(now())
 }
 
 model Comment {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   content   String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  createdAt DateTime @default(now())
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  String?
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
 }
 
 model Vote {
   id     String @id @default(cuid())
   type   String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@unique([userId, postId])
+}
+
+model Like {
+  id     String @id @default(cuid())
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)

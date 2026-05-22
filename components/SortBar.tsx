@@ -2,7 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SortBar() {
+type Props = {
+  showTrending?: boolean;
+};
+
+export default function SortBar({ showTrending = false }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const current = searchParams.get("sort") || "latest";
@@ -10,6 +14,7 @@ export default function SortBar() {
   function handleSort(sort: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", sort);
+    params.delete("page");
     router.push(`?${params.toString()}`);
   }
 
@@ -18,9 +23,7 @@ export default function SortBar() {
       <button
         onClick={() => handleSort("latest")}
         className={`flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold transition ${
-          current === "latest"
-            ? "bg-[#e8f0fe] text-[#0079d3]"
-            : "text-[#878a8c] hover:bg-[#f6f7f8]"
+          current === "latest" ? "bg-[#e8f0fe] text-[#0079d3]" : "text-[#878a8c] hover:bg-[#f6f7f8]"
         }`}
       >
         🕐 Latest
@@ -28,13 +31,21 @@ export default function SortBar() {
       <button
         onClick={() => handleSort("popular")}
         className={`flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold transition ${
-          current === "popular"
-            ? "bg-[#fff4f0] text-[#ff4500]"
-            : "text-[#878a8c] hover:bg-[#f6f7f8]"
+          current === "popular" ? "bg-[#fff4f0] text-[#ff4500]" : "text-[#878a8c] hover:bg-[#f6f7f8]"
         }`}
       >
         🔥 Popular
       </button>
+      {showTrending && (
+        <button
+          onClick={() => handleSort("trending")}
+          className={`flex items-center gap-1 px-4 py-2 rounded-full text-sm font-semibold transition ${
+            current === "trending" ? "bg-[#fff8e1] text-[#ff8c00]" : "text-[#878a8c] hover:bg-[#f6f7f8]"
+          }`}
+        >
+          ⚡ Trending
+        </button>
+      )}
     </div>
   );
 }
