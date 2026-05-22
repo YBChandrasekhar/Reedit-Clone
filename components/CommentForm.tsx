@@ -8,6 +8,7 @@ type Comment = {
   id: string;
   content: string;
   createdAt: string;
+  authorId: string;
   author: { username: string };
 };
 
@@ -25,12 +26,7 @@ export default function CommentForm({ postId, onCommentAdded }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    if (!isSignedIn) {
-      router.push("/sign-in");
-      return;
-    }
-
+    if (!isSignedIn) { router.push("/sign-in"); return; }
     if (!content.trim()) return;
     setError("");
     setLoading(true);
@@ -44,11 +40,7 @@ export default function CommentForm({ postId, onCommentAdded }: Props) {
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) {
-      setError(data.error);
-      return;
-    }
-
+    if (!res.ok) { setError(data.error); return; }
     setContent("");
     onCommentAdded(data);
   }
