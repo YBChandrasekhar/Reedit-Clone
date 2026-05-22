@@ -206,7 +206,7 @@ export default async function Home({
           <div className="bg-white rounded-lg border border-[#edeff1] p-4">
             <h2 className="font-bold mb-3">🔥 Top Communities</h2>
             <div className="flex flex-col gap-2">
-              {(communities as Community[]).map((c, i) => (
+              {(communities as Community[]).map((c: Community, i: number) => (
                 <Link
                   key={c.id}
                   href={`/r/${c.slug}`}
